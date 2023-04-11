@@ -28,6 +28,7 @@ public class Obj {
 	}
 	
 	public static void follow(GameObject A, GameObject B) {
+		// More Function
 		getClose(A, B);
 	}
 	
