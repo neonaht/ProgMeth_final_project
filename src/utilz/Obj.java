@@ -4,27 +4,31 @@ import logic.base.GameObject;
 
 public class Obj {
 	
-	public static void follow(GameObject A, GameObject B) {
+	public static void getClose(GameObject A, GameObject B) {
 		boolean setX = false;
 		boolean setY = false;
 		
 		if(Math.abs(A.getxPos() - B.getxPos()) < A.getxVelo()) {
-			A.setxVelo(0);
+			A.setxPos(B.getxPos());
 			setX = true;
 		}
 		if(Math.abs(A.getyPos() - B.getyPos()) < A.getyVelo()) {
-			A.setyVelo(0);
+			A.setyPos(B.getyPos());
 			setY = true;
 		}
 		
 		if(!setX)
-			if(A.getxPos() < B.getxPos()) A.setxVelo(Math.abs(A.getxVelo()));
-			else if(A.getxPos() > B.getxPos()) A.setxVelo(-Math.abs(A.getxVelo()));
+			if(A.getxPos() < B.getxPos()) A.setxPos(A.getxPos() + Math.abs(A.getxVelo()));
+			else if(A.getxPos() > B.getxPos()) A.setxPos(A.getxPos() - Math.abs(A.getxVelo()));
 		if(!setY)
-			if(A.getyPos() < B.getyPos()) A.setyVelo(Math.abs(A.getyVelo()));
-			else if(A.getyPos() > B.getyPos()) A.setyVelo(-Math.abs(A.getyVelo()));
+			if(A.getyPos() < B.getyPos()) A.setyPos(A.getyPos() + Math.abs(A.getyVelo()));
+			else if(A.getyPos() > B.getyPos()) A.setyPos(A.getyPos() - Math.abs(A.getyVelo()));
 		
 		return ;
+	}
+	
+	public static void follow(GameObject A, GameObject B) {
+		getClose(A, B);
 	}
 	
 	public static double distance(GameObject A, GameObject B) {

@@ -32,8 +32,8 @@ public class Criminal extends Person {
 		double _Vx = getxVelo();
 		double _Vy = getyVelo();
 		
-		setxPos(getxPos() + _Vx);
-		setyPos(getyPos() + _Vy);
+//		setxPos(getxPos() + _Vx);
+//		setyPos(getyPos() + _Vy);
 //		
 //		if(Math.abs(getxPos() - init_xPos) > disc) setxVelo(-getxVelo());
 //		if(Math.abs(getyPos() - init_yPos) > disc) setyVelo(-getyVelo());
