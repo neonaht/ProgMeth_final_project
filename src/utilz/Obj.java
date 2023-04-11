@@ -1,8 +1,20 @@
 package utilz;
 
 import logic.base.GameObject;
+import logic.base.ID;
+import logic.person.Player;
+import logic.container.Bullet;
 
 public class Obj {
+	
+	public static void action(GameObject A, GameObject B) {
+		if(A.getId() == ID.Player) {
+			if(B.getId() == ID.Bullet) {
+				((Player)A).setHp(((Player)A).getHp() - ((Bullet)B).damage());
+			}
+		}
+		return ;
+	}
 	
 	public static void getClose(GameObject A, GameObject B) {
 		boolean setX = false;

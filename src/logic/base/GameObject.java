@@ -1,17 +1,22 @@
 package logic.base;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public abstract class GameObject {
 	
 	protected double xPos, yPos;
 	protected double xVelo, yVelo;
+	protected Rectangle SolidArea;
+	protected int SolidX, SolidY;
 	protected ID id;
+	protected int Code;
 	
 	public GameObject(double xPos, double yPos, ID id) {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.id = id;
+		this.Code = Handler.Code++;
 	}
 	
 	public void move() {
@@ -59,6 +64,33 @@ public abstract class GameObject {
 		this.yVelo = yVelo;
 		return ;
 	}
+	
+	public Rectangle getSolidArea() {
+		return SolidArea;
+	}
+
+	public void setSolidArea(Rectangle solidArea) {
+		SolidArea = solidArea;
+		return ;
+	}
+
+	public int getSolidX() {
+		return SolidX;
+	}
+
+	public void setSolidX(int solidX) {
+		SolidX = solidX;
+		return ;
+	}
+
+	public int getSolidY() {
+		return SolidY;
+	}
+
+	public void setSolidY(int solidY) {
+		SolidY = solidY;
+		return ;
+	}
 
 	public ID getId() {
 		return id;
@@ -69,6 +101,13 @@ public abstract class GameObject {
 		return ;
 	}
 	
-	
+	public int getCode() {
+		return Code;
+	}
+
+	public void setCode(int code) {
+		Code = code;
+		return ;
+	}
 	
 }

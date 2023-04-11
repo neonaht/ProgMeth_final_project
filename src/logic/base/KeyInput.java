@@ -20,6 +20,16 @@ public class KeyInput extends KeyAdapter {
 		if(keyInt == KeyEvent.VK_DOWN) key.DOWN = true;
 		if(keyInt == KeyEvent.VK_SHIFT) key.SHIFT = true;
 		if(keyInt == KeyEvent.VK_SPACE) key.SPACE = true;
+		if(keyInt == KeyEvent.VK_0) key.ZERO = true;
+		if(keyInt == KeyEvent.VK_1) key.ONE = true;
+		if(keyInt == KeyEvent.VK_2) key.TWO = true;
+		if(keyInt == KeyEvent.VK_3) key.THREE = true;
+		if(keyInt == KeyEvent.VK_4) key.FOUR = true;
+		if(keyInt == KeyEvent.VK_5) key.FIVE = true;
+		if(keyInt == KeyEvent.VK_6) key.SIX = true;
+		if(keyInt == KeyEvent.VK_7) key.SEVEN = true;
+		if(keyInt == KeyEvent.VK_8) key.EIGHT = true;
+		if(keyInt == KeyEvent.VK_9) key.NINE = true;
 		
 	}
 	
@@ -36,6 +46,16 @@ public class KeyInput extends KeyAdapter {
 		if(keyInt == KeyEvent.VK_DOWN) key.DOWN = false;
 		if(keyInt == KeyEvent.VK_SHIFT) key.SHIFT = false;
 		if(keyInt == KeyEvent.VK_SPACE) key.SPACE = false;
+		if(keyInt == KeyEvent.VK_0) key.ZERO = false;
+		if(keyInt == KeyEvent.VK_1) key.ONE = false;
+		if(keyInt == KeyEvent.VK_2) key.TWO = false;
+		if(keyInt == KeyEvent.VK_3) key.THREE = false;
+		if(keyInt == KeyEvent.VK_4) key.FOUR = false;
+		if(keyInt == KeyEvent.VK_5) key.FIVE = false;
+		if(keyInt == KeyEvent.VK_6) key.SIX = false;
+		if(keyInt == KeyEvent.VK_7) key.SEVEN = false;
+		if(keyInt == KeyEvent.VK_8) key.EIGHT = false;
+		if(keyInt == KeyEvent.VK_9) key.NINE = false;
 		
 	}
 	

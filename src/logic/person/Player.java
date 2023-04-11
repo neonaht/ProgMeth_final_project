@@ -15,9 +15,11 @@ import logic.container.Bullet;
 import logic.container.PinkBlock;
 import utilz.Checker;
 import utilz.LoadSave;
+import utilz.Obj;
 
 public class Player extends Person {
 	
+	// default
 	private double _ac = .8f;
 	private double _dc = .4f;
 	private KeyInput input;
@@ -44,12 +46,15 @@ public class Player extends Person {
 		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
 		setSolidX(40);
 		setSolidY(55);
+		setHp(100);
 		setDirect("U");
 		setPrv_direct("Z");
 		setKey(new Keys());
 		previousAni = T_Up[defaultAni];
 		
 		// Tempt
+		
+		gun = true;
 		
 	}
 	
@@ -104,22 +109,30 @@ public class Player extends Person {
 
 	@Override
 	public void update() {
-		_CurxPos = getxPos();
-		_CuryPos = getyPos();
+		
+//		Collision();
+//		if(getHp() == 0) System.out.println("die");
 		
 		setKey(input.key);
 		
+		if(key.ONE) {
+			setUsed(1);
+			if(getUsed() == 1) setSpeed(.8f, .4f);
+		}
+		if(key.TWO) {
+			setUsed(2);
+			if(getUsed() == 2) setSpeed(.7f, .35f);
+		}
+		if(key.THREE) {
+			setUsed(3);
+			if(getUsed() == 3) setSpeed(.5f, .25f);
+		}
+		
+		_CurxPos = getxPos();
+		_CuryPos = getyPos();
+		
 		double _Vx = getxVelo();
 		double _Vy = getyVelo();
-		
-		Rectangle C = null;
-		for(int i = 0; i < handler.all_objects.size(); i++) {
-			if(handler.all_objects.get(i).getId() == ID.Criminal) {
-				C = ((Person)handler.all_objects.get(i)).getSolidArea();
-				break;
-			}
-		}
-		if(getSolidArea().intersects(C)) System.out.println("YES !");
 		
 		if(key.A) _Vx -= _ac;
 		else if(key.D) _Vx += _ac;
@@ -135,19 +148,19 @@ public class Player extends Person {
 			else if(_Vy < 0) _Vy += _dc;
 		}
 		
-		if(getUsed() == 0) setDirect(Checker.KeyWalkDirection(key));
+		if(getUsed() == 1) setDirect(Checker.KeyWalkDirection(key));
 		else setDirect(Checker.KeyDirection(key));
 		
 		if(BulletTime < 30) BulletTime++;
 		if(KnifeTime < 30) KnifeTime++;
 		
-		if(getUsed() != 0 && (key.LEFT || key.RIGHT || key.UP || key.DOWN)) {
-			if(getUsed() == 1 && KnifeTime == 30) slash();
-			if(getUsed() == 2 && BulletTime == 30) shoot();
+		if(getUsed() != 1 && (key.LEFT || key.RIGHT || key.UP || key.DOWN)) {
+			if(getUsed() == 2 && KnifeTime == 30) slash();
+			if(getUsed() == 3 && BulletTime == 30) shoot();
 		}
 		
-		_Vx = cut(_Vx, -3.2f, 3.2f);
-		_Vy = cut(_Vy, -3.2f, 3.2f);
+		_Vx = cut(_Vx, -get_ac() * 4, get_ac() * 4);
+		_Vy = cut(_Vy, -get_ac() * 4, get_ac() * 4);
 		
 		setxPos(getxPos() + _Vx - (key.SHIFT ? _Vx / 2 : 0));
 		setyPos(getyPos() + _Vy - (key.SHIFT ? _Vy / 2 : 0));
@@ -155,12 +168,42 @@ public class Player extends Person {
 		setxVelo(_Vx);
 		setyVelo(_Vy);
 		
-		if(BulletTime > 30) BulletTime = 0;
-		if(KnifeTime > 30) KnifeTime = 0;
+		if(BulletTime >= 30) BulletTime = 0;
+		if(KnifeTime >= 30) KnifeTime = 0;
 		
 		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
 		
+		Animation();
+		
 		return ;
+	}
+	
+	public void Animation() {
+		if(direct != prv_direct) SpriteCnt = 0;
+		int frame = (SpriteCnt / 5) % 8;
+		
+		switch(getUsed()) {
+			case 1 : WalkAni(frame); break;
+			case 2 : KnifeAni(frame); break;
+			case 3 : GunAni(frame); break;
+			default : WalkAni(frame); break;
+		}
+		
+		SpriteCnt++;
+		if(direct != "Z") prv_direct = direct;
+		previousAni = currentAni;
+		SpriteCnt %= 40;
+		return ;
+	}
+	
+	public void Collision() { // ERROR NOT FIXING YET
+		for(int i = 0; i < handler.all_objects.size(); i++) {
+			if(handler.all_objects.get(i).getCode() == this.getCode()) continue;
+			if(this.SolidArea.intersects(handler.all_objects.get(i).getSolidArea())) {
+				Obj.action(this, handler.all_objects.get(i));
+				handler.removeObject(handler.all_objects.get(i));
+			}
+		}
 	}
 	
 	public void shoot() {
@@ -189,8 +232,6 @@ public class Player extends Person {
 	public void slash() {
 		if(!KnifeAvailable() || handler.Player == null) return ;
 		
-		KnifeTime = 0;
-		
 		return ;
 	}
 	
@@ -210,20 +251,6 @@ public class Player extends Person {
 
 	@Override
 	public void render(Graphics g) { // Set Player Graphics
-		if(direct != prv_direct) SpriteCnt = 0;
-		int frame = (SpriteCnt / 15) % 8;
-		
-		switch(getUsed()) {
-			case 0 : WalkAni(frame); break;
-			case 1 : KnifeAni(frame); break;
-			case 2 : GunAni(frame); break;
-			default : WalkAni(frame); break;
-		}
-		
-		SpriteCnt++;
-		if(direct != "Z") prv_direct = direct;
-		previousAni = currentAni;
-		SpriteCnt %= 120;
 		g.drawImage(currentAni, (int)xPos, (int)yPos, null);
 		
 		return ;
@@ -340,6 +367,12 @@ public class Player extends Person {
 				break;
 			}
 		}
+	}
+	
+	public void setSpeed(double _ac, double _dc) {
+		set_ac(_ac);
+		set_dc(_dc);
+		return ;
 	}
 	
 	// Getters & Setters

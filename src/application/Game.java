@@ -18,6 +18,7 @@ import logic.container.Knife;
 import logic.container.PinkBlock;
 import logic.person.Criminal;
 import logic.person.Player;
+import tile.TileManager;
 import utilz.LoadSave;
 
 import static utilz.Constants.Screen.*;
@@ -32,6 +33,16 @@ public class Game extends Canvas implements Runnable {
 	private Handler handler;
 	private KeyInput input;
 	private Camera cam;
+	
+	public final int originalTileSize = 16;
+    public final int scale = 3;
+    public final int tileSize = originalTileSize * scale;
+    public final int maxScreenCol = 110;
+    public final int maxScreenRow = 60;
+    public final int screenWidth = tileSize * maxScreenCol;
+    public final int screenHeight = tileSize * maxScreenRow;
+    
+    TileManager tileM = new TileManager(this);
 
 	private Map map = new Map(100, 100, ID.Map);
 
@@ -129,6 +140,8 @@ public class Game extends Canvas implements Runnable {
 		g2d.translate(-cam.getX(), -cam.getY());
 
 		map.render(g2d);
+//		tileM.draw(g2d);
+		
 		handler.render(g2d);
 
 		g2d.translate(cam.getX(), cam.getY());

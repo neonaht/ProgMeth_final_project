@@ -8,8 +8,7 @@ import logic.base.ID;
 
 public abstract class Person extends GameObject {
 	
-	protected Rectangle SolidArea;
-	protected int SolidX, SolidY;
+	protected int Hp, bullets;
 	protected boolean gun, knife;
 	protected int used;
 	protected int SpriteCnt, BulletTime, KnifeTime;
@@ -25,7 +24,7 @@ public abstract class Person extends GameObject {
 		super(xPos, yPos, id);
 		setxVelo(0);
 		setyVelo(0);
-		setUsed(0);
+		setUsed(1);
 		setDirect("Z");
 		setPrv_direct("Z");
 		setSpriteCnt(0);
@@ -43,6 +42,7 @@ public abstract class Person extends GameObject {
 	public abstract void render(Graphics g);
 	public abstract void shoot();
 	public abstract void slash();
+	public abstract void Animation();
 	
 	public boolean GunAvailable() {
 		return gun;
@@ -54,30 +54,21 @@ public abstract class Person extends GameObject {
 	
 	// Getters & Setters
 	
-	public Rectangle getSolidArea() {
-		return SolidArea;
+	public int getHp() {
+		return Hp;
 	}
 
-	public void setSolidArea(Rectangle solidArea) {
-		SolidArea = solidArea;
+	public void setHp(int hp) {
+		Hp = Math.max(hp, 0);
 		return ;
 	}
 
-	public int getSolidX() {
-		return SolidX;
+	public int getBullets() {
+		return bullets;
 	}
 
-	public void setSolidX(int solidX) {
-		SolidX = solidX;
-		return ;
-	}
-
-	public int getSolidY() {
-		return SolidY;
-	}
-
-	public void setSolidY(int solidY) {
-		SolidY = solidY;
+	public void setBullets(int bullets) {
+		this.bullets = bullets;
 		return ;
 	}
 	
@@ -104,8 +95,10 @@ public abstract class Person extends GameObject {
 	}
 
 	public void setUsed(int used) {
-		if(used < 0 || used > 2) this.used = 0;
-		else this.used = used;
+		if(used < 1 || used > 3) this.used = 1;
+		else if(used == 2 && this.knife) this.used = 2;
+		else if(used == 3 && this.gun) this.used = 3;
+		else this.used = 1;
 		return ;
 	}
 

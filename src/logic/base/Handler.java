@@ -11,6 +11,7 @@ public class Handler {
 	
 	public LinkedList<GameObject> all_objects = new LinkedList<GameObject>();
 	public Player Player;
+	public static int Code = 10000;
 	
 	public Handler() {
 		all_objects = new LinkedList<GameObject>();

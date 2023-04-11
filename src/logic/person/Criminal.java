@@ -16,6 +16,7 @@ public class Criminal extends Person {
 	
 	private Handler handler;
 	private double init_xPos, init_yPos, disc;
+	private int status = 0;
 
 	public Criminal(int xPos, int yPos, ID id, Handler handler, double xVelo, double yVelo, double disc) {
 		super(xPos, yPos, id);
@@ -27,12 +28,12 @@ public class Criminal extends Person {
 		this.disc = disc;
 		
 		// Tempt
-		
-		BulletTime = 0;
+
 		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
+		setHp(100);
 		setDirect(Checker.GetDirectionByVelo(getxVelo(), getyVelo()));
-		setUsed(2);
 		gun = true;
+		setUsed(3);
 		
 	}
 
@@ -44,20 +45,24 @@ public class Criminal extends Person {
 		if(BulletTime < 30) BulletTime++;
 		if(KnifeTime < 30) KnifeTime++;
 		
-		if(getUsed() == 1 && KnifeTime == 30) slash();
-		if(getUsed() == 2 && BulletTime == 30) shoot();
+		if(getUsed() == 2 && KnifeTime == 30) slash();
+		if(getUsed() == 3 && BulletTime == 30) shoot();
 		
-		if(BulletTime > 30) BulletTime = 0;
-		if(KnifeTime > 30) KnifeTime = 0;
+		if(BulletTime >= 30) BulletTime = 0;
+		if(KnifeTime >= 30) KnifeTime = 0;
 		
 		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
 		
 		return ;
 	}
+	
+	public void Animation() {
+		if(getDirect() != "Z") setPrv_direct(getDirect());
+		return ;
+	}
 
 	@Override
 	public void render(Graphics g) {
-		if(getDirect() != "Z") setPrv_direct(getDirect());
 		g.setColor(Color.red);
 		g.fillOval((int)getxPos(), (int)getyPos(), 32, 32);
 		return ;
@@ -84,15 +89,14 @@ public class Criminal extends Person {
 			}
 		}
 		
-		BulletTime = 0;
-		
 		return ;
 	}
 
 	@Override
 	public void slash() {
-		// TODO Auto-generated method stub
+		if(!KnifeAvailable() || handler.Player == null) return ;
 		
+		return ;
 	}
 	
 }
