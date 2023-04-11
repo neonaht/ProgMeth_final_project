@@ -4,7 +4,7 @@ public class Keys {
 	public boolean Q, W, E, R, T, Y, U, I, O, P;
 	public boolean A, S, D, F, G, H, J, K, L;
 	public boolean Z, X, C, V, B, N, M;
-	public boolean SHIFT;
+	public boolean SHIFT, SPACE, LEFT, RIGHT, UP, DOWN;
 	
 	public Keys() {
 		Q = false;
@@ -34,6 +34,11 @@ public class Keys {
 		N = false;
 		M = false;
 		SHIFT = false;
+		SPACE = false;
+		LEFT = false;
+		RIGHT = false;
+		UP = false;
+		DOWN = false;
 	}
 	
 }

@@ -10,7 +10,7 @@ import utilz.LoadSave;
 
 public class Map extends GameObject {
 
-	private BufferedImage bg = LoadSave.GetSpriteAtlas(LoadSave.MAP_FULL_DEMO);
+	private BufferedImage bg = LoadSave.GetSpriteAtlas("Maps/demo_full_map.png");
 	
 	public Map(double xPos, double yPos, ID id) {
 		super(xPos, yPos, id);

@@ -46,4 +46,15 @@ public class Obj {
 		return Math.abs(A.getyPos() - B.getyPos());
 	}
 	
+	public static String getDirection(GameObject A, GameObject B) {
+		if(A.getxPos() - B.getxPos() > 0) {
+			if(disX(A, B) >= disY(A, B)) return "L";
+			if(A.getyPos() - B.getyPos() > 0) return "U";
+			return "D";
+		}
+		if(disX(A, B) >= disY(A, B)) return "R";
+		if(A.getyPos() - B.getyPos() > 0) return "U";
+		return "D";
+	}
+	
 }

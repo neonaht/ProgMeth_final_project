@@ -1,6 +1,5 @@
 package application;
 
-// Hello World
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -25,8 +24,8 @@ import static utilz.Constants.Screen.*;
 
 public class Game extends Canvas implements Runnable {
 
-	public static int WIDTH = S_WIDTH_DEFAULT;
-	public static int HEIGHT = S_HEIGHT_DEFAULT;
+	public static final int WIDTH = S_WIDTH_DEFAULT;
+	public static final int HEIGHT = S_HEIGHT_DEFAULT;
 	private Thread thread;
 	private boolean isRunning = false;
 
@@ -39,17 +38,18 @@ public class Game extends Canvas implements Runnable {
 	public Game() {
 		new Window(WIDTH, HEIGHT, TITLE, this);
 		initial();
-
+		
 		start();
 	}
 
 	private void initial() {
 		input = new KeyInput();
-		handler = new Handler(new LinkedList<GameObject>(), new Player(500, 520, ID.Player, input));
+		handler = new Handler();
 		cam = new Camera(0, 0, handler);
 		addKeyListener(input);
 
-		handler.addObject(new Criminal(700, 720, ID.Criminal, handler, 2.5, 2.5, 100));
+		handler.Player = new Player(500, 480, ID.Player, handler, input);
+		handler.addObject(new Criminal(700, 720, ID.Criminal, handler, 2, 2, 100));
 	}
 
 	private synchronized void start() {

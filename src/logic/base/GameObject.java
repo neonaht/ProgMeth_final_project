@@ -14,6 +14,11 @@ public abstract class GameObject {
 		this.id = id;
 	}
 	
+	public void move() {
+		setxPos(getxPos() + getxVelo());
+		setyPos(getyPos() + getyVelo());
+	}
+	
 	public abstract void update();
 	public abstract void render(Graphics g);
 	

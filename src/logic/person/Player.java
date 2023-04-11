@@ -2,13 +2,17 @@ package logic.person;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import application.Game;
 import logic.base.GameObject;
+import logic.base.Handler;
 import logic.base.ID;
 import logic.base.KeyInput;
 import logic.base.Keys;
+import logic.container.Bullet;
+import logic.container.PinkBlock;
 import utilz.Checker;
 import utilz.LoadSave;
 
@@ -18,6 +22,8 @@ public class Player extends Person {
 	private double _dc = .4f;
 	private KeyInput input;
 	private Keys key;
+	
+	private Handler handler;
 
 	public static double _CurxPos;
 	public static double _CuryPos;
@@ -25,21 +31,26 @@ public class Player extends Person {
 	private BufferedImage[] T_Up, T_Down, T_Left, T_Right;
 	BufferedImage currentAni, previousAni;
 	private final int defaultAni = 9;
-	private int SpriteCnt;
-	private String direct, prv_direct;
 	
-	public Player(double xPos, double yPos, ID id, KeyInput input) {
+	public Player(double xPos, double yPos, ID id, Handler handler, KeyInput input) {
 		super(xPos, yPos, id);
 		this.input = input;
-		setxVelo(0);
-		setyVelo(0);
+		this.handler = handler;
 		_CurxPos = xPos;
 		_CuryPos = yPos;
+
 		initImg();
-		SpriteCnt = 0;
-		direct = "R";
-		prv_direct = "Z";
+		
+		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
+		setSolidX(40);
+		setSolidY(55);
+		setDirect("U");
+		setPrv_direct("Z");
+		setKey(new Keys());
 		previousAni = T_Up[defaultAni];
+		
+		// Tempt
+		
 	}
 	
 	public void initImg() {
@@ -96,10 +107,19 @@ public class Player extends Person {
 		_CurxPos = getxPos();
 		_CuryPos = getyPos();
 		
-		this.key = input.key;
+		setKey(input.key);
 		
 		double _Vx = getxVelo();
 		double _Vy = getyVelo();
+		
+		Rectangle C = null;
+		for(int i = 0; i < handler.all_objects.size(); i++) {
+			if(handler.all_objects.get(i).getId() == ID.Criminal) {
+				C = ((Person)handler.all_objects.get(i)).getSolidArea();
+				break;
+			}
+		}
+		if(getSolidArea().intersects(C)) System.out.println("YES !");
 		
 		if(key.A) _Vx -= _ac;
 		else if(key.D) _Vx += _ac;
@@ -115,7 +135,16 @@ public class Player extends Person {
 			else if(_Vy < 0) _Vy += _dc;
 		}
 		
-		direct = Checker.KeyDirection(key);
+		if(getUsed() == 0) setDirect(Checker.KeyWalkDirection(key));
+		else setDirect(Checker.KeyDirection(key));
+		
+		if(BulletTime < 30) BulletTime++;
+		if(KnifeTime < 30) KnifeTime++;
+		
+		if(getUsed() != 0 && (key.LEFT || key.RIGHT || key.UP || key.DOWN)) {
+			if(getUsed() == 1 && KnifeTime == 30) slash();
+			if(getUsed() == 2 && BulletTime == 30) shoot();
+		}
 		
 		_Vx = cut(_Vx, -3.2f, 3.2f);
 		_Vy = cut(_Vy, -3.2f, 3.2f);
@@ -125,6 +154,42 @@ public class Player extends Person {
 		
 		setxVelo(_Vx);
 		setyVelo(_Vy);
+		
+		if(BulletTime > 30) BulletTime = 0;
+		if(KnifeTime > 30) KnifeTime = 0;
+		
+		setSolidArea(new Rectangle((int)getxPos(), (int)getyPos(), 40, 55));
+		
+		return ;
+	}
+	
+	public void shoot() {
+		if(!GunAvailable() || handler.Player == null) return ;
+		
+		switch(getDirect()) {
+			case "LEFT" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, -20, 0)); break;
+			case "RIGHT" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 20, 0)); break;
+			case "UP" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 0, -20)); break;
+			case "DOWN" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 0, 20)); break;
+			default : {
+				switch(getPrv_direct()) {
+					case "LEFT" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, -20, 0)); break;
+					case "RIGHT" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 20, 0)); break;
+					case "UP" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 0, -20)); break;
+					case "DOWN" : handler.addObject(new Bullet(getxPos(), getyPos(), ID.Bullet, 0, 20)); break;
+					default : break;
+				}
+				break;
+			}
+		}
+		
+		return ;
+	}
+	
+	public void slash() {
+		if(!KnifeAvailable() || handler.Player == null) return ;
+		
+		KnifeTime = 0;
 		
 		return ;
 	}
@@ -145,9 +210,26 @@ public class Player extends Person {
 
 	@Override
 	public void render(Graphics g) { // Set Player Graphics
-		BufferedImage currentAni;
 		if(direct != prv_direct) SpriteCnt = 0;
 		int frame = (SpriteCnt / 15) % 8;
+		
+		switch(getUsed()) {
+			case 0 : WalkAni(frame); break;
+			case 1 : KnifeAni(frame); break;
+			case 2 : GunAni(frame); break;
+			default : WalkAni(frame); break;
+		}
+		
+		SpriteCnt++;
+		if(direct != "Z") prv_direct = direct;
+		previousAni = currentAni;
+		SpriteCnt %= 120;
+		g.drawImage(currentAni, (int)xPos, (int)yPos, null);
+		
+		return ;
+	}
+	
+	private void WalkAni(int frame) {
 		switch(direct) {
 			case "L" : currentAni = T_Left[frame]; break;
 			case "R" : currentAni = T_Right[frame]; break;
@@ -164,13 +246,100 @@ public class Player extends Person {
 				break;
 			}
 		}
-		SpriteCnt++;
-		prv_direct = direct;
-		previousAni = currentAni;
-		SpriteCnt %= 120;
-		g.drawImage(currentAni, (int)xPos, (int)yPos, null);
+	}
+	
+	private void KnifeAni(int frame) { // TODO
+		// TODO Auto-generated method stub
 		
-		return ;
+	}
+
+	private void GunAni(int frame) { // TODO
+		if(Checker.UnpressedWalkDirection(key) && Checker.UnpressedHitDirection(key)) {
+			switch(direct) {
+				case "LEFT" : currentAni = T_Left[frame]; break;
+				case "RIGHT" : currentAni = T_Right[frame]; break;
+				case "UP" : currentAni = T_Up[frame]; break;
+				case "DOWN" : currentAni = T_Down[frame]; break;
+				case "L" : currentAni = T_Left[frame]; break;
+				case "R" : currentAni = T_Right[frame]; break;
+				case "U" : currentAni = T_Up[frame]; break;
+				case "D" : currentAni = T_Down[frame]; break;
+				default : {
+					switch(prv_direct) {
+						case "LEFT" : currentAni = T_Left[defaultAni]; break;
+						case "RIGHT" : currentAni = T_Right[defaultAni]; break;
+						case "UP" : currentAni = T_Up[defaultAni]; break;
+						case "DOWN" : currentAni = T_Down[defaultAni]; break;
+						case "L" : currentAni = T_Left[defaultAni]; break;
+						case "R" : currentAni = T_Right[defaultAni]; break;
+						case "U" : currentAni = T_Up[defaultAni]; break;
+						case "D" : currentAni = T_Down[defaultAni]; break;
+						default : currentAni = previousAni; break;
+					}
+					break;
+				}
+			}
+		}
+		else if(Checker.UnpressedWalkDirection(key)) {
+			switch(direct) {
+				case "LEFT" : currentAni = T_Left[defaultAni]; break;
+				case "RIGHT" : currentAni = T_Right[defaultAni]; break;
+				case "UP" : currentAni = T_Up[defaultAni]; break;
+				case "DOWN" : currentAni = T_Down[defaultAni]; break;
+				default : {
+					switch(prv_direct) {
+						case "LEFT" : currentAni = T_Left[defaultAni]; break;
+						case "RIGHT" : currentAni = T_Right[defaultAni]; break;
+						case "UP" : currentAni = T_Up[defaultAni]; break;
+						case "DOWN" : currentAni = T_Down[defaultAni]; break;
+						default : currentAni = previousAni; break;
+					}
+					break;
+				}
+			}
+		}
+		else if(Checker.UnpressedHitDirection(key)) {
+			switch(direct) {
+				case "L" : currentAni = T_Left[frame]; break;
+				case "R" : currentAni = T_Right[frame]; break;
+				case "U" : currentAni = T_Up[frame]; break;
+				case "D" : currentAni = T_Down[frame]; break;
+				default : {
+					switch(prv_direct) {
+						case "L" : currentAni = T_Left[defaultAni]; break;
+						case "R" : currentAni = T_Right[defaultAni]; break;
+						case "U" : currentAni = T_Up[defaultAni]; break;
+						case "D" : currentAni = T_Down[defaultAni]; break;
+						default : currentAni = previousAni; break;
+					}
+					break;
+				}
+			}
+		}
+		else switch(direct) {
+			case "LEFT" : currentAni = T_Left[frame]; break;
+			case "RIGHT" : currentAni = T_Right[frame]; break;
+			case "UP" : currentAni = T_Up[frame]; break;
+			case "DOWN" : currentAni = T_Down[frame]; break;
+			case "L" : currentAni = T_Left[frame]; break;
+			case "R" : currentAni = T_Right[frame]; break;
+			case "U" : currentAni = T_Up[frame]; break;
+			case "D" : currentAni = T_Down[frame]; break;
+			default : {
+				switch(prv_direct) {
+					case "LEFT" : currentAni = T_Left[defaultAni]; break;
+					case "RIGHT" : currentAni = T_Right[defaultAni]; break;
+					case "UP" : currentAni = T_Up[defaultAni]; break;
+					case "DOWN" : currentAni = T_Down[defaultAni]; break;
+					case "L" : currentAni = T_Left[defaultAni]; break;
+					case "R" : currentAni = T_Right[defaultAni]; break;
+					case "U" : currentAni = T_Up[defaultAni]; break;
+					case "D" : currentAni = T_Down[defaultAni]; break;
+					default : currentAni = previousAni; break;
+				}
+				break;
+			}
+		}
 	}
 	
 	// Getters & Setters
@@ -201,5 +370,24 @@ public class Player extends Person {
 		this.input = input;
 		return ;
 	}
+
+	public String getDirect() {
+		return direct;
+	}
+
+	public void setDirect(String direct) {
+		this.direct = direct;
+		return ;
+	}
+
+	public Keys getKey() {
+		return key;
+	}
+
+	public void setKey(Keys key) {
+		this.key = key;
+		return ;
+	}
+	
 	
 }
