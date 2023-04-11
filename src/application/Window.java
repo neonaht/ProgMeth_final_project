@@ -19,5 +19,6 @@ public class Window {
 		frame.add(game);
 		frame.setVisible(true);
 		
+		
 	}
 }

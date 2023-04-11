@@ -11,7 +11,7 @@ public class Constants {
 	
 	public static class Screen {
 		public static String TITLE = "Ship Hide";
-		public static final int S_WIDTH_DEFAULT = 800;
+		public static final int S_WIDTH_DEFAULT = 960;
 		public static final int S_HEIGHT_DEFAULT = 640;
 	}
 
