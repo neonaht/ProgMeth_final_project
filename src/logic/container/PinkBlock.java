@@ -1,8 +1,7 @@
 package logic.container;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import logic.base.GameObject;
 import logic.base.ID;
 
@@ -27,11 +26,11 @@ public class PinkBlock extends GameObject {
 	}
 
 	@Override
-	public void render(Graphics g) {
+	public void render(GraphicsContext gc) {
 		if(!isVisible()) return ;
 		
-		g.setColor(Color.pink);
-		g.fillRect((int)xPos, (int)yPos, 48, 48);
+		gc.setFill(Color.PINK);
+		gc.fillRect((int)xPos, (int)yPos, 48, 48);
 		return ;
 	}
 	

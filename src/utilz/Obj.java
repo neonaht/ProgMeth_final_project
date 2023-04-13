@@ -6,7 +6,7 @@ import logic.person.Player;
 import logic.container.Bullet;
 
 public class Obj {
-	
+
 	public static void action(GameObject A, GameObject B) {
 		if(A.getId() == ID.Player) {
 			if(B.getId() == ID.Bullet) {

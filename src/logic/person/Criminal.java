@@ -1,9 +1,9 @@
 package logic.person;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import logic.base.GameObject;
 import logic.base.Handler;
 import logic.base.ID;
@@ -62,9 +62,9 @@ public class Criminal extends Person {
 	}
 
 	@Override
-	public void render(Graphics g) {
-		g.setColor(Color.red);
-		g.fillOval((int)getxPos(), (int)getyPos(), 32, 32);
+	public void render(GraphicsContext gc) {
+		gc.setFill(Color.RED);
+		gc.fillOval((int)getxPos(), (int)getyPos(), 32, 32);
 		return ;
 	}
 

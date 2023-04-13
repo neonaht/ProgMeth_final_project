@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import javafx.scene.canvas.GraphicsContext;
 import logic.person.Person;
 import logic.person.Player;
 
@@ -24,11 +25,11 @@ public class Handler {
 		Player.update();
 	}
 	
-	public void render(Graphics g) {
+	public void render(GraphicsContext gc) {
 		for(int i = 0; i < all_objects.size(); i++) {
-			all_objects.get(i).render(g);
+			all_objects.get(i).render(gc);
 		}
-		Player.render(g);
+		Player.render(gc);
 		return ;
 	}
 	

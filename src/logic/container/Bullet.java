@@ -1,9 +1,8 @@
 package logic.container;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import logic.base.GameObject;
 import logic.base.Handler;
 import logic.base.ID;
@@ -51,9 +50,9 @@ public class Bullet extends GameObject {
 	}
 
 	@Override
-	public void render(Graphics g) {
-		g.setColor(Color.black);
-		g.fillOval((int)getxPos(), (int)getyPos(), 8, 8);
+	public void render(GraphicsContext gc) {
+		gc.setFill(Color.BLACK);
+		gc.fillOval((int)getxPos(), (int)getyPos(), 8, 8);
 		return ;
 	}
 	

@@ -1,11 +1,10 @@
 package logic.person;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-
 import application.Game;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import logic.base.GameObject;
 import logic.base.Handler;
 import logic.base.ID;
@@ -30,8 +29,8 @@ public class Player extends Person {
 	public static double _CurxPos;
 	public static double _CuryPos;
 	
-	private BufferedImage[] T_Up, T_Down, T_Left, T_Right;
-	BufferedImage currentAni, previousAni;
+	private Image[] T_Up, T_Down, T_Left, T_Right;
+	Image currentAni, previousAni;
 	private final int defaultAni = 9;
 	
 	public Player(double xPos, double yPos, ID id, Handler handler, KeyInput input) {
@@ -59,7 +58,7 @@ public class Player extends Person {
 	}
 	
 	public void initImg() {
-		T_Up = new BufferedImage[12];
+		T_Up = new Image[12];
 		T_Up[defaultAni] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Up_Default);
 		T_Up[0] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Up_0);
 		T_Up[1] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Up_1);
@@ -70,7 +69,7 @@ public class Player extends Person {
 		T_Up[6] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Up_6);
 		T_Up[7] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Up_7);
 		
-		T_Down = new BufferedImage[12];
+		T_Down = new Image[12];
 		T_Down[defaultAni] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Down_Default);
 		T_Down[0] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Down_0);
 		T_Down[1] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Down_1);
@@ -81,7 +80,7 @@ public class Player extends Person {
 		T_Down[6] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Down_6);
 		T_Down[7] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Down_7);
 		
-		T_Left = new BufferedImage[12];
+		T_Left = new Image[12];
 		T_Left[defaultAni] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Left_Default);
 		T_Left[0] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Left_0);
 		T_Left[1] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Left_1);
@@ -92,7 +91,7 @@ public class Player extends Person {
 		T_Left[6] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Left_6);
 		T_Left[7] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Left_7);
 		
-		T_Right = new BufferedImage[12];
+		T_Right = new Image[12];
 		T_Right[defaultAni] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Right_Default);
 		T_Right[0] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Right_0);
 		T_Right[1] = LoadSave.GetSpriteAtlas(LoadSave.Player_Animation_Right_1);
@@ -199,7 +198,7 @@ public class Player extends Person {
 	public void Collision() { // ERROR NOT FIXING YET
 		for(int i = 0; i < handler.all_objects.size(); i++) {
 			if(handler.all_objects.get(i).getCode() == this.getCode()) continue;
-			if(this.SolidArea.intersects(handler.all_objects.get(i).getSolidArea())) {
+			if(this.SolidArea.intersects(handler.all_objects.get(i).getSolidArea().getBoundsInLocal())) {
 				Obj.action(this, handler.all_objects.get(i));
 				handler.removeObject(handler.all_objects.get(i));
 			}
@@ -250,8 +249,10 @@ public class Player extends Person {
 	}
 
 	@Override
-	public void render(Graphics g) { // Set Player Graphics
-		g.drawImage(currentAni, (int)xPos, (int)yPos, null);
+	public void render(GraphicsContext gc) { // Set Player Graphics
+		gc.drawImage(currentAni, xPos, yPos);
+//		gc.setFill(Color.GREENYELLOW);
+//		gc.fillOval((int)getxPos(), (int)getyPos(), 32, 32);
 		
 		return ;
 	}

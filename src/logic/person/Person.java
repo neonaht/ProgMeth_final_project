@@ -3,6 +3,7 @@ package logic.person;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
+import javafx.scene.canvas.GraphicsContext;
 import logic.base.GameObject;
 import logic.base.ID;
 
@@ -39,7 +40,7 @@ public abstract class Person extends GameObject {
 	}
 	
 	public abstract void update();
-	public abstract void render(Graphics g);
+	public abstract void render(GraphicsContext gc);
 	public abstract void shoot();
 	public abstract void slash();
 	public abstract void Animation();

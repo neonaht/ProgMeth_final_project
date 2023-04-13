@@ -1,10 +1,13 @@
 package utilz;
 
-import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.print.DocFlavor.URL;
+
+import javafx.scene.image.Image;
 
 public class LoadSave {
 
@@ -52,23 +55,8 @@ public class LoadSave {
 	public static final String Player_Animation_Right_6 = "Animation/T_Right_6.png";
 	public static final String Player_Animation_Right_7 = "Animation/T_Right_7.png";
 
-	public static BufferedImage GetSpriteAtlas(String fileName) {
-		BufferedImage img = null;
-		InputStream is = LoadSave.class.getResourceAsStream("/" + fileName);
-		try {
-			img = ImageIO.read(is);
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-		finally {
-			try {
-				is.close();
-			}
-			catch(IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return img;
+	public static Image GetSpriteAtlas(String fileName) {
+		Image image = new Image("/" + fileName);
+		return image;
 	}
 }

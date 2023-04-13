@@ -1,7 +1,7 @@
 package logic.base;
 
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.Rectangle;
 
 public abstract class GameObject {
 	
@@ -25,7 +25,7 @@ public abstract class GameObject {
 	}
 	
 	public abstract void update();
-	public abstract void render(Graphics g);
+	public abstract void render(GraphicsContext gc);
 	
 	// Getters & Setters
 

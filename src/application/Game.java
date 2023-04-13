@@ -1,14 +1,21 @@
 package application;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import logic.base.GameObject;
 import logic.base.Handler;
 import logic.base.ID;
@@ -23,15 +30,18 @@ import utilz.LoadSave;
 
 import static utilz.Constants.Screen.*;
 
-public class Game extends Canvas implements Runnable {
+public class Game extends Application {
 
 	public static final int WIDTH = S_WIDTH_DEFAULT;
 	public static final int HEIGHT = S_HEIGHT_DEFAULT;
+	public static final int FPS = 600;
+	
+	private long lastUpdateTime;
 	private Thread thread;
 	private boolean isRunning = false;
 
 	private Handler handler;
-	private KeyInput input;
+	private KeyInput input = new KeyInput();
 	private Camera cam;
 	
 	public final int originalTileSize = 16;
@@ -46,74 +56,62 @@ public class Game extends Canvas implements Runnable {
 
 	private Map map = new Map(100, 100, ID.Map);
 
-	public Game() {
-		new Window(WIDTH, HEIGHT, TITLE, this);
-		initial();
-		
-		start();
-	}
-
 	private void initial() {
-		input = new KeyInput();
 		handler = new Handler();
 		cam = new Camera(0, 0, handler);
-		addKeyListener(input);
 
 		handler.Player = new Player(500, 480, ID.Player, handler, input);
 		handler.addObject(new Criminal(700, 720, ID.Criminal, handler, 2, 2, 100));
 	}
 
-	private synchronized void start() {
-		if (isRunning)
-			return;
-
-		thread = new Thread(this);
-		thread.start();
-		isRunning = true;
+	public void start(Stage stage) throws Exception {
+		Canvas canvas = new Canvas(960, 640);
+		Scene scene = new Scene(new StackPane(canvas));
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+//		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(20), e -> run(gc)));
+//		timeline.setCycleCount(Timeline.INDEFINITE);
+//		timeline.play();
+		run(gc);
+		stage.setScene(scene);
+		scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+			input.keyPressed(key);
+		});
+		scene.addEventHandler(KeyEvent.KEY_RELEASED, (key) -> {
+			input.keyReleased(key);
+		});
+		stage.setTitle("Ship Hide");
+		initial();
+		stage.show();
 	}
+	
+	private void run(GraphicsContext gc) {
+		AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long currentUpdateTime) {
+                // Calculate the time elapsed since the last update
+                long delta = currentUpdateTime - lastUpdateTime;
 
-	private synchronized void stop() {
-		if (!isRunning)
-			return;
-		isRunning = false;
+                // Update the lastUpdateTime
+                lastUpdateTime = currentUpdateTime;
 
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+                // Calculate the frames per second (fps)
+                double fps = 1_000_000_000.0 / delta;
+
+                // Check if the elapsed time is greater than or equal to the target time per frame
+                if (delta >= 1_000_000_000 / FPS) {
+                    update();
+                }
+                render(gc);
+                return ;
+            }
+        };
+
+        // Start the AnimationTimer
+        timer.start();
 	}
-
-	public static void main(String args[]) {
-		new Game();
-	}
-
-	@Override
-	public void run() {
-		this.requestFocus();
-		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
-		double ns = 1000000000 / amountOfTicks;
-		double delta = 0;
-		long timer = System.currentTimeMillis();
-		int frames = 0;
-		while (isRunning) {
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			while (delta >= 1) {
-				update();
-				delta--;
-			}
-			render();
-			frames++;
-
-			if (System.currentTimeMillis() - timer > 1000) {
-				timer += 1000;
-				frames = 0;
-			}
-		}
-		stop();
+	
+	public static void main(String[] args) {
+		launch(args);
 	}
 
 	// Updates the game
@@ -124,30 +122,22 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	// Render the game
-	private void render() {
-		BufferStrategy bs = this.getBufferStrategy();
-		if (bs == null) {
-			this.createBufferStrategy(3);
-			return;
-		}
+	private void render(GraphicsContext gc) {
 
-		Graphics g = bs.getDrawGraphics();
-		Graphics2D g2d = (Graphics2D) g;
+		gc.setFill(Color.CYAN);
+		gc.fillRect(0, 0, WIDTH, HEIGHT);
+//
+		gc.translate(-cam.getX(), -cam.getY());
 
-		g.setColor(Color.cyan);
-		g.fillRect(0, 0, WIDTH, HEIGHT);
-
-		g2d.translate(-cam.getX(), -cam.getY());
-
-		map.render(g2d);
+		map.render(gc);
 //		tileM.draw(g2d);
 		
-		handler.render(g2d);
-
-		g2d.translate(cam.getX(), cam.getY());
-
-		bs.show();
-		g.dispose();
+		handler.render(gc);
+//
+		gc.translate(cam.getX(), cam.getY());
+//
+//		bs.show();
+//		g.dispose();
 
 	}
 
